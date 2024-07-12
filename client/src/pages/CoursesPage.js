@@ -28,7 +28,6 @@ const CoursesPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post("http://localhost:8080/api/courses", {
-        title,
         detail,
       });
       console.log("Course saved:", response.data);
