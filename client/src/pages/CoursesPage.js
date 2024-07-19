@@ -1,34 +1,30 @@
-// import React, { useState } from "react";
-// import AnimationRevealPage from "helpers/AnimationRevealPage.js";
-// import { Container, ContentWithPaddingXl } from "components/misc/Layouts";
-// import tw from "twin.macro";
-// import styled from "styled-components";
-// import { css } from "styled-components/macro";
-// import Header from "components/headers/light.js";
-// import Footer from "components/footers/FiveColumnWithInputForm.js";
-// import { SectionHeading } from "components/misc/Headings";
-// import { PrimaryButton } from "components/misc/Buttons";
-
-// const CoursesPage = () => {
-//   return null;
-// };
-// export default CoursesPage;
-
-import Header from "components/headers/light.js";
-import React, { useState } from "react";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { useState, useEffect, useRef } from "react";
+import Footer from "components/footers/SimpleFiveColumn.js";
 import axios from "axios";
+// import "ckeditor5/ckeditor5.css";
+// import "../styles/CoursesPage.css";
+import TextEditor from "./TextEditor";
+import Header from "components/headers/light.js";
+import "../styles/NewCourse.css";
 
 const CoursesPage = () => {
   const [title, setTitle] = useState("");
-  const [detail, setDetail] = useState("");
+  const [instructor, setInstructor] = useState("");
+  const [price, setPrice] = useState("");
+  const [language, setLanguage] = useState("");
+  const [categories, setCategories] = useState("");
+  const [intro, setIntro] = useState("");
 
-  const addLesson = async (e) => {
+  const createCourse = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8080/api/courses", {
-        detail,
+      const response = await axios.post("http://localhost:8080/api/courses/", {
+        title,
+        instructor,
+        price,
+        language,
+        categories,
+        intro,
       });
       console.log("Course saved:", response.data);
     } catch (error) {
@@ -37,23 +33,103 @@ const CoursesPage = () => {
   };
   return (
     <div>
-      <Header />
-      <div></div>
-      <CKEditor
-        editor={ClassicEditor}
-        data="<p>Design your lesson here!</p>"
-        onReady={(editor) => {
-          console.log("Editor is ready to use!", editor);
-        }}
-        // onChange={handleDetail}
-        onBlur={(event, editor) => {
-          console.log("Blur.", editor);
-        }}
-        onFocus={(event, editor) => {
-          console.log("Focus.", editor);
-        }}
-      />
-      <button onClick={addLesson}>Add Lesson</button>
+      <div className="header">
+        <Header />
+      </div>
+
+      <div>
+        <div className="wrapper">
+          <form>
+            <h1>New Course</h1>
+            <hr className="sep" />
+            <div className="group">
+              <input
+                type="text"
+                required
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+              <span className="highlight"></span>
+              <span className="bar"></span>
+              <label>Title</label>
+            </div>
+            <div className="group">
+              <input
+                type="text"
+                required
+                value={instructor}
+                onChange={(e) => setInstructor(e.target.value)}
+              />
+              <span className="highlight"></span>
+              <span className="bar"></span>
+              <label>Instructor</label>
+            </div>
+            <div className="group">
+              <input
+                type="text"
+                required
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+              <span className="highlight"></span>
+              <span className="bar"></span>
+              <label>Price</label>
+            </div>
+            <div className="group">
+              <input
+                type="text"
+                required
+                value={language}
+                onChange={(e) =>
+                  setLanguage(
+                    e.target.value.split(",").map((lan) => lan.trim())
+                  )
+                }
+              />
+              <span className="highlight"></span>
+              <span className="bar"></span>
+              <label>Language</label>
+            </div>
+            <div className="group">
+              <input
+                type="text"
+                required
+                value={categories}
+                onChange={(e) =>
+                  setCategories(
+                    e.target.value.split(",").map((cat) => cat.trim())
+                  )
+                }
+              />
+              <span className="highlight"></span>
+              <span className="bar"></span>
+              <label>Categories</label>
+            </div>
+            <div className="group">
+              <textarea
+                type="textarea"
+                rows="5"
+                required
+                value={intro}
+                onChange={(e) => setIntro(e.target.value)}
+              />
+              <span className="highlight"></span>
+              <span className="bar"></span>
+              <label>Introduction</label>
+            </div>
+            <div className="btn-box">
+              <button
+                className="btn btn-submit"
+                type="button"
+                onClick={createCourse}
+              >
+                Submit
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <Footer />
     </div>
   );
 };

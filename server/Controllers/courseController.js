@@ -3,16 +3,14 @@ const Course = require("../Schema/courseSchema");
 //create course
 const createCourse = async (req, res) => {
   try {
-    const { title, instructor, language, categories, tags, price, detail } =
-      req.body;
+    const { title, instructor, language, categories, intro, price } = req.body; //add title, instructor, language, categories, tags, price,
     const newCourse = new Course({
       title,
       instructor,
       language,
       categories,
-      tags,
+      intro,
       price,
-      detail,
     });
     await newCourse.save();
     res.status(201).json(newCourse);
