@@ -14,30 +14,53 @@ const CoursesPage = () => {
   const [language, setLanguage] = useState("");
   const [categories, setCategories] = useState("");
   const [intro, setIntro] = useState("");
+  const [coursesList, setCoursesList] = useState([]);
 
   const createCourse = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8080/api/courses/", {
-        title,
-        instructor,
-        price,
-        language,
-        categories,
-        intro,
-      });
+      const response = await axios.post(
+        "http://localhost:8080/api/courses/create_course",
+        {
+          title,
+          instructor,
+          price,
+          language,
+          categories,
+          intro,
+        }
+      );
       console.log("Course saved:", response.data);
     } catch (error) {
       console.error("Error saving course", error);
     }
   };
+
+  //get all the courses from db
+  const fetchCourses = async () => {
+    await axios
+      .get(`http://localhost:8080/api/courses/`)
+      .then((res) => setCoursesList(res.data))
+      .catch((e) => console.log(e));
+  };
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  //display all the courses from db to the screen
+  let list = coursesList.map((item) => {
+    return <li key={item.id}>{item.name}</li>;
+  });
   return (
     <div>
-      <div className="header">
-        <Header />
-      </div>
+      <Header />
 
       <div>
+        <div>
+          <ul>{list}</ul>
+        </div>
+
         <div className="wrapper">
           <form>
             <h1>New Course</h1>
