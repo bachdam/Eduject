@@ -38,10 +38,18 @@ const CoursesPage = () => {
 
   //get all the courses from db
   const fetchCourses = async () => {
-    await axios
-      .get(`http://localhost:8080/api/courses/`)
-      .then((res) => setCoursesList(res.data))
-      .catch((e) => console.log(e));
+    // await axios
+    //   .get(`http://localhost:8080/api/courses/`)
+    //   .then((res) => setCoursesList(res.data))
+    //   .catch((e) => console.log(e));
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/courses/get_courses`
+      );
+      setCoursesList(response.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -50,7 +58,8 @@ const CoursesPage = () => {
 
   //display all the courses from db to the screen
   let list = coursesList.map((item) => {
-    return <li key={item.id}>{item.name}</li>;
+    console.log(item.title);
+    return <li key={item._id}>{item.title}</li>;
   });
   return (
     <div>

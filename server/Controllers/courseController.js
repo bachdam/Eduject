@@ -22,6 +22,13 @@ const createCourse = async (req, res) => {
   }
 };
 
-const getCourse = async (req, res) => {};
+const getCourse = async (req, res) => {
+  try {
+    const courses = await Course.find();
+    res.status(200).json(courses);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
 
 module.exports = { createCourse, getCourse };
