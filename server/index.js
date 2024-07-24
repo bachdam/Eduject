@@ -6,6 +6,7 @@ require("dotenv").config();
 const port = process.env.PORT || 8080;
 const atlasURL = process.env.ATLAS_URI;
 const routeCourse = require("./routes/routeCourse");
+const routeLesson = require("./routes/routeLesson");
 
 const app = express();
 app.use(
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 //api
 app.use("/api/user", routeUser);
 app.use("/api/courses", routeCourse);
+app.use("/api/lessons", routeLesson);
 
 app.get("/", (req, res) => {
   res.send("Hello from backend");

@@ -31,6 +31,15 @@ const CoursesPage = () => {
         }
       );
       console.log("Course saved:", response.data);
+      setCoursesList([response.data, ...coursesList]);
+      fetchCourses();
+      setTitle("");
+      setInstructor("");
+      setPrice("");
+      setLanguage("");
+      setCategories("");
+      setIntro("");
+      setCoursesList([]);
     } catch (error) {
       console.error("Error saving course", error);
     }
@@ -39,7 +48,7 @@ const CoursesPage = () => {
   //get all the courses from db
   const fetchCourses = async () => {
     // await axios
-    //   .get(`http://localhost:8080/api/courses/`)
+    //   .get(`http://localhost:8080/api/courses/get_courses`)
     //   .then((res) => setCoursesList(res.data))
     //   .catch((e) => console.log(e));
     try {
@@ -59,18 +68,15 @@ const CoursesPage = () => {
   //display all the courses from db to the screen
   let list = coursesList.map((item) => {
     console.log(item.title);
-    return <li key={item._id}>{item.title}</li>;
+    return <button key={item._id}>{item.title}</button>;
   });
   return (
     <div>
       <Header />
 
       <div>
-        <div>
-          <ul>{list}</ul>
-        </div>
-
         <div className="wrapper">
+          <div className="courses_list">{list}</div>
           <form>
             <h1>New Course</h1>
             <hr className="sep" />

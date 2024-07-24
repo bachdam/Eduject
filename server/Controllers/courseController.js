@@ -22,7 +22,8 @@ const createCourse = async (req, res) => {
   }
 };
 
-const getCourse = async (req, res) => {
+//get all courses
+const getAllCourse = async (req, res) => {
   try {
     const courses = await Course.find();
     res.status(200).json(courses);
@@ -31,4 +32,4 @@ const getCourse = async (req, res) => {
   }
 };
 
-module.exports = { createCourse, getCourse };
+module.exports = { createCourse, getAllCourse };
