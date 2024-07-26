@@ -32,4 +32,14 @@ const getAllCourse = async (req, res) => {
   }
 };
 
-module.exports = { createCourse, getAllCourse };
+//get a course
+const getCourse = async (req, res) => {
+  try {
+    const course = await Course.find({}, { projection: { _id: 1 } });
+    res.status(200).json(course);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+module.exports = { createCourse, getAllCourse, getCourse };

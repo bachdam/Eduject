@@ -107,6 +107,7 @@ import ThankYouPage from "ThankYouPage.js";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import CoursesPage from "pages/CoursesPage";
 import AuthProvider from "components/Authorization/Auth";
+import LessonPage from "pages/LessonPage";
 
 export default function App() {
   // If you want to disable the animation just use the disabled `prop` like below on your page's component
@@ -149,6 +150,7 @@ export default function App() {
           <Route path="/blog" element={<BlogIndexPage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/courses/:courseId/lessons" element={<LessonPage />} />
         </Routes>
       </Router>
     </AuthProvider>

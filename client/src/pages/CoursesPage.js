@@ -6,6 +6,7 @@ import axios from "axios";
 import TextEditor from "./TextEditor";
 import Header from "components/headers/light.js";
 import "../styles/NewCourse.css";
+import { json, useNavigate } from "react-router-dom";
 
 const CoursesPage = () => {
   const [title, setTitle] = useState("");
@@ -15,6 +16,7 @@ const CoursesPage = () => {
   const [categories, setCategories] = useState("");
   const [intro, setIntro] = useState("");
   const [coursesList, setCoursesList] = useState([]);
+  const navigate = useNavigate();
 
   const createCourse = async (e) => {
     e.preventDefault();
@@ -61,6 +63,24 @@ const CoursesPage = () => {
     }
   };
 
+  //access to the course
+  // const chosenCourse = async (req) => {
+  //   try {
+  //     const courseId = req.params;
+  //     const response = await axios.get(
+  //       `http://localhost:8080/api/courses/:${courseId}`
+  //     );
+  //     console.log(response.data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  const chosenCourse = async (courseId) => {
+    console.log(courseId);
+    navigate(`/courses/${courseId}/lessons`);
+  };
+
   useEffect(() => {
     fetchCourses();
   }, []);
@@ -68,7 +88,11 @@ const CoursesPage = () => {
   //display all the courses from db to the screen
   let list = coursesList.map((item) => {
     console.log(item.title);
-    return <button key={item._id}>{item.title}</button>;
+    return (
+      <button key={item._id} onClick={() => chosenCourse(item._id)}>
+        {item.title}
+      </button>
+    );
   });
   return (
     <div>

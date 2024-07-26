@@ -52,7 +52,7 @@ import "ckeditor5/ckeditor5.css";
 
 import "../styles/CoursesPage.css";
 
-export default function TextEditor() {
+export default function TextEditor({ value, onChange }) {
   const editorContainerRef = useRef(null);
   const editorRef = useRef(null);
   const [isLayoutReady, setIsLayoutReady] = useState(false);
@@ -224,7 +224,7 @@ export default function TextEditor() {
         options: ["alignBlockLeft", "block", "alignBlockRight"],
       },
     },
-    initialData: "Design your lesson here!",
+    initialData: "",
     link: {
       addTargetToExternalLinks: true,
       defaultProtocol: "https://",
@@ -314,10 +314,11 @@ export default function TextEditor() {
                 <CKEditor
                   editor={ClassicEditor}
                   config={editorConfig}
+                  data={value}
                   onChange={(event, editor) => {
                     const data = editor.getData();
-
-                    console.log({ event, editor, data });
+                    onChange(data);
+                    // console.log({ event, editor, data });
                   }}
                 />
               )}

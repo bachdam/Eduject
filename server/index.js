@@ -15,13 +15,13 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 //api
 app.use("/api/user", routeUser);
 app.use("/api/courses", routeCourse);
-app.use("/api/lessons", routeLesson);
+app.use("/api/courses/:id/lessons", routeLesson);
 
 app.get("/", (req, res) => {
   res.send("Hello from backend");
