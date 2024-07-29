@@ -14,11 +14,11 @@ const createLesson = async (req, res) => {
 };
 
 //get lessons of a course
-const getAllLesson = async (req, res) => {
+const getAllLessons = async (req, res) => {
   try {
-    const course_id = req.params.course_id;
+    const course_id = req.params.id;
     console.log(course_id);
-    const lessons = await Lesson.find({ course_id: course_id });
+    const lessons = await Lesson.find({ course_id });
     console.log(lessons);
     res.status(200).json(lessons);
   } catch (error) {
@@ -26,4 +26,4 @@ const getAllLesson = async (req, res) => {
   }
 };
 
-module.exports = { createLesson, getAllLesson };
+module.exports = { createLesson, getAllLessons };

@@ -1,12 +1,12 @@
 const express = require("express");
 const {
   createLesson,
-  getAllLesson,
+  getAllLessons,
 } = require("../Controllers/lessonController");
 
 const routeLesson = express.Router();
 
-routeLesson.post("/create_lesson", createLesson);
-routeLesson.get("/get_all_lesson", getAllLesson);
+routeLesson.post("/:id/create_lesson", createLesson);
+routeLesson.get("/:id/get_all_lessons", getAllLessons);
 
 module.exports = routeLesson;

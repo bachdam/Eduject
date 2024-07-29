@@ -19,7 +19,7 @@ const LessonPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/courses/${course_id}/lessons/create_lesson`,
+        `http://localhost:8080/api/lessons/${course_id}/create_lesson`,
         {
           title,
           detail,
@@ -39,10 +39,10 @@ const LessonPage = () => {
   const fetchLessons = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/courses/${course_id}/lessons/get_all_lesson`
+        `http://localhost:8080/api/lessons/${course_id}/get_all_lessons`
       );
       console.log(response.data);
-      setLessonsList(response.data);
+      setLessonsList([response.data, ...lessonsList]);
     } catch (error) {
       console.log(error);
     }
