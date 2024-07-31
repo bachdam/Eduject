@@ -33,7 +33,7 @@ const getAllCourse = async (req, res) => {
 };
 
 //get a course
-const getCourse = async (req, res) => {
+const getCourseId = async (req, res) => {
   try {
     const course = await Course.find({}, { projection: { _id: 1 } });
     res.status(200).json(course);
@@ -42,4 +42,18 @@ const getCourse = async (req, res) => {
   }
 };
 
-module.exports = { createCourse, getAllCourse, getCourse };
+//get course name
+const getCourseName = async (req, res) => {
+  try {
+    const course_id = req.params.id;
+    const course = await Course.findById(course_id, {
+      projection: { _id: 0 },
+    });
+    console.log(course);
+    res.status(200).json(course.title);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+module.exports = { createCourse, getAllCourse, getCourseId, getCourseName };

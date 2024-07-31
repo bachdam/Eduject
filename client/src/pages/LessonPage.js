@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import Footer from "components/footers/SimpleFiveColumn.js";
 import axios from "axios";
+import "../styles/LessonPage.css";
 // import "ckeditor5/ckeditor5.css";
 // import "../styles/CoursesPage.css";
 import TextEditor from "./TextEditor";
 import Header from "components/headers/light.js";
 import { useParams } from "react-router-dom";
+import updateIcon from "../images/refresh.png";
+import deleteIcon from "../images/bin.png";
 
 const LessonPage = () => {
   const { courseId } = useParams();
@@ -13,13 +16,14 @@ const LessonPage = () => {
   const [title, setTitle] = useState("");
   const [detail, setDetail] = useState("");
   const [lessonsList, setLessonsList] = useState([]);
+  const [courseName, setCourseName] = useState("");
 
   //create lesson
   const createLesson = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/lessons/${course_id}/create_lesson`,
+        `http://localhost:8080/api/lessons/${course_id}/`,
         {
           title,
           detail,
@@ -27,7 +31,7 @@ const LessonPage = () => {
         }
       );
       console.log("Lesson saved:", response.data);
-      setLessonsList([response.data, ...lessonsList]);
+      setLessonsList([...lessonsList, response.data]);
       setTitle("");
       setDetail("");
     } catch (error) {
@@ -39,49 +43,116 @@ const LessonPage = () => {
   const fetchLessons = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/lessons/${course_id}/get_all_lessons`
+        `http://localhost:8080/api/lessons/${course_id}/`
       );
-      console.log(response.data);
-      setLessonsList([response.data, ...lessonsList]);
+      const course_name = await axios.get(
+        `http://localhost:8080/api/courses/name/${course_id}/`
+      );
+      setLessonsList(response.data);
+      setCourseName(course_name.data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const chosenlessons = async (courseId) => {
-    console.log(courseId);
-    // navigate(`/courses/${courseId}/lessons`);
-  };
+  // const chosenlessons = async (courseId) => {
+  //   console.log(courseId);
+  //   // navigate(`/courses/${courseId}/lessons`);
+  // };
 
   useEffect(() => {
     fetchLessons();
   }, []);
 
-  //display all the courses from db to the screen
-  let list = lessonsList.map((item) => {
-    console.log(item.title);
-    return <li key={item._id}>{item.title}</li>;
-  });
+  //update a lesson
+  const updateLesson = async (lesson_id) => {
+    console.log("lessonId: ", lesson_id);
+    try {
+      const response = await axios.put(
+        `http://localhost:8080/api/lessons/${course_id}/${lesson_id}/`,
+        {
+          title,
+          detail,
+        }
+      );
+      console.log("Lesson updated:", response.data);
+      // setLessonsList([response.data, ...lessonsList]);
+      setLessonsList((prevLessons) =>
+        prevLessons.map((item) =>
+          item._id === lesson_id ? response.data : item
+        )
+      );
+      setTitle("");
+      setDetail("");
+    } catch (error) {
+      console.error("Error updating course", error);
+    }
+  };
+
+  //delete a lesson
+  const deleteLesson = async (lesson_id) => {
+    console.log("lessonId: ", lesson_id);
+    try {
+      const response = await axios.delete(
+        `http://localhost:8080/api/lessons/${course_id}/${lesson_id}/`
+      );
+      console.log("Lesson deleted:", response.data);
+      setLessonsList((prevLessons) =>
+        prevLessons.filter((item) => item._id != lesson_id)
+      );
+    } catch (error) {
+      console.error("Error deleting course", error);
+    }
+  };
 
   return (
-    <div className="container">
+    <div>
       <Header />
-      <div className="lessons_display">
-        <ul>{list}</ul>
-      </div>
-      <div>
-        <input
-          type="text"
-          value={title}
-          placeholder="Title here!"
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <TextEditor value={detail} onChange={setDetail} />
+      <h1 className="course_name">{courseName}</h1>
+      <div className="container">
+        <div className="lessons_display">
+          <ul>
+            {lessonsList.map((item, index) => {
+              console.log("item title:", item.title);
+              console.log("lessonsList: ", lessonsList);
+              return (
+                <li key={index} className="lessonTitle">
+                  {item.title}{" "}
+                  <button
+                    key={item._id}
+                    type="submit"
+                    onClick={() => updateLesson(item._id)}
+                  >
+                    <img src={updateIcon} />
+                  </button>
+                  <button
+                    key={index}
+                    type="submit"
+                    className="deletebtn"
+                    onClick={() => deleteLesson(item._id)}
+                  >
+                    <img src={deleteIcon} />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <div>
+          <input
+            type="text"
+            value={title}
+            placeholder="Title here!"
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <TextEditor value={detail} onChange={setDetail} />
+        </div>
+
+        <button type="submit" onClick={createLesson}>
+          Add Lesson
+        </button>
       </div>
 
-      <button type="submit" onClick={createLesson}>
-        Add Lesson
-      </button>
       <Footer />
     </div>
   );
