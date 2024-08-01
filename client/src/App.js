@@ -108,11 +108,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import CoursesPage from "pages/CoursesPage";
 import AuthProvider from "components/Authorization/Auth";
 import LessonPage from "pages/LessonPage";
-
+import { useContext } from "react";
 export default function App() {
   // If you want to disable the animation just use the disabled `prop` like below on your page's component
   // return <AnimationRevealPage disabled>xxxxxxxxxx</AnimationRevealPage>;
-
+  // const { user } = useContext(AuthProvider);
   return (
     <AuthProvider>
       <GlobalStyles />

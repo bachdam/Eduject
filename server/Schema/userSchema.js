@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema({
   },
   num_of_courses: {
     type: Number,
+    default: 0,
   },
 });
 

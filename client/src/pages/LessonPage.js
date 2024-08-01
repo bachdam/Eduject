@@ -9,6 +9,7 @@ import Header from "components/headers/light.js";
 import { useParams } from "react-router-dom";
 import updateIcon from "../images/refresh.png";
 import deleteIcon from "../images/bin.png";
+import DOMPurify from "dompurify";
 
 const LessonPage = () => {
   const { courseId } = useParams();
@@ -17,6 +18,7 @@ const LessonPage = () => {
   const [detail, setDetail] = useState("");
   const [lessonsList, setLessonsList] = useState([]);
   const [courseName, setCourseName] = useState("");
+  const [selectedLesson, setSelectedLesson] = useState("");
 
   //create lesson
   const createLesson = async (e) => {
@@ -54,11 +56,6 @@ const LessonPage = () => {
       console.log(error);
     }
   };
-
-  // const chosenlessons = async (courseId) => {
-  //   console.log(courseId);
-  //   // navigate(`/courses/${courseId}/lessons`);
-  // };
 
   useEffect(() => {
     fetchLessons();
@@ -98,60 +95,112 @@ const LessonPage = () => {
       );
       console.log("Lesson deleted:", response.data);
       setLessonsList((prevLessons) =>
-        prevLessons.filter((item) => item._id != lesson_id)
+        prevLessons.filter((item) => item._id !== lesson_id)
       );
     } catch (error) {
       console.error("Error deleting course", error);
     }
   };
 
+  const chosenLesson = async (courseId) => {
+    console.log(courseId);
+    // navigate(`/courses/${courseId}/lessons`);
+  };
+
+  //use purify to get rid of malicious js to prevent XSS attack
+  const verifiedLessonContent = () => ({
+    __html: DOMPurify.sanitize(selectedLesson.detail),
+  });
   return (
     <div>
       <Header />
-      <h1 className="course_name">{courseName}</h1>
-      <div className="container">
-        <div className="lessons_display">
-          <ul>
-            {lessonsList.map((item, index) => {
-              console.log("item title:", item.title);
-              console.log("lessonsList: ", lessonsList);
-              return (
-                <li key={index} className="lessonTitle">
-                  {item.title}{" "}
-                  <button
-                    key={item._id}
-                    type="submit"
-                    onClick={() => updateLesson(item._id)}
-                  >
-                    <img src={updateIcon} />
-                  </button>
-                  <button
-                    key={index}
-                    type="submit"
-                    className="deletebtn"
-                    onClick={() => deleteLesson(item._id)}
-                  >
-                    <img src={deleteIcon} />
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-        <div>
-          <input
-            type="text"
-            value={title}
-            placeholder="Title here!"
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <TextEditor value={detail} onChange={setDetail} />
-        </div>
+      {/* day */}
+      <div>
+        <h1 className="course_name">{courseName}</h1>
+        <div className="container">
+          <div className="lessons_display">
+            <ul>
+              {lessonsList.map((item, index) => {
+                console.log("item title:", item.title);
+                console.log("lessonsList: ", lessonsList);
+                return (
+                  <li key={index} className="lessonTitle">
+                    {item.title}{" "}
+                    <button
+                      key={item._id}
+                      type="submit"
+                      onClick={() => updateLesson(item._id)}
+                    >
+                      <img src={updateIcon} alt="update icon" />
+                    </button>
+                    <button
+                      key={index}
+                      type="submit"
+                      className="deletebtn"
+                      onClick={() => deleteLesson(item._id)}
+                    >
+                      <img src={deleteIcon} alt="delete icon" />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          <div>
+            <input
+              type="text"
+              value={title}
+              placeholder="Title here!"
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <TextEditor value={detail} onChange={setDetail} />
+          </div>
 
-        <button type="submit" onClick={createLesson}>
-          Add Lesson
-        </button>
+          <button type="submit" onClick={createLesson}>
+            Add Lesson
+          </button>
+        </div>
       </div>
+      {/* day */}
+      {/* <div className="course-container">
+        <h1 className="course-name">{courseName}</h1>
+        <div className="content-container">
+          <div className="lesson-content">
+            {selectedLesson ? (
+              // <p>{selectedLesson.detail}</p>
+              <div
+                className="lesson-detail"
+                // dangerouslySetInnerHTML={{ __html: selectedLesson.detail }}
+                dangerouslySetInnerHTML={verifiedLessonContent()}
+              ></div>
+            ) : (
+              <p>Please select a lesson to view its content.</p>
+            )}
+          </div>
+          <div className="lessons">
+            <div className="lesson-header">
+              <span className="view-title">Lessons</span>
+            </div>
+            <ul>
+              {lessonsList.map((item, index) => {
+                return (
+                  <li key={index}>
+                    <button
+                      className="lesson-button"
+                      onClick={() => {
+                        console.log(item);
+                        setSelectedLesson(item);
+                      }}
+                    >
+                      {item.title}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+      </div> */}
 
       <Footer />
     </div>

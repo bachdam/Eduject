@@ -11,7 +11,8 @@ const token = (_id) => {
 
 //signup user
 const createUser = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { name, gender, username, password, email, role, num_of_courses } =
+    req.body;
   const user = await User.findOne({ email });
   if (user) {
     return res.status(401).json("A user with this email already exists!");
@@ -22,13 +23,29 @@ const createUser = async (req, res) => {
   }
 
   //create new user if all fields satisfy
-  newUser = new User({ username, email, password });
+  newUser = new User({
+    name,
+    gender,
+    username,
+    password,
+    email,
+    role,
+    num_of_courses,
+  });
 
   const saltRounds = 10;
   const salt = await bcrypt.genSaltSync(saltRounds);
   const hash = await bcrypt.hash(password, salt);
 
-  newUser = new User({ username, email, password: hash });
+  newUser = new User({
+    name,
+    gender,
+    username,
+    password: hash,
+    email,
+    role,
+    num_of_courses,
+  });
 
   newUser.save();
   res.status(200).json(newUser);
@@ -54,4 +71,13 @@ const updateUser = async (req, res) => {};
 
 //delet user
 const deleteUser = async (req, res) => {};
+
+// sign up postman
+// {
+//   "name": "B",
+//   "gender": "male",
+//   "username":"b",
+//   "password":"b",
+//   "email":"b@gmail.com"
+// }
 module.exports = { createUser, loginUser };
