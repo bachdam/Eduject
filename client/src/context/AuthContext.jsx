@@ -8,7 +8,7 @@ export const AuthContextProvider = ({ children }) => {
   const [registerError, setRegisterError] = useState(null);
   const [isRegisterLoading, setIsRegisterLoading] = useState(false);
   const [registerInfor, setRegisterInfor] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
   });
@@ -46,7 +46,7 @@ export const AuthContextProvider = ({ children }) => {
       setIsRegisterLoading(true);
       setRegisterError(null);
       const response = await postRequest(
-        `${baseURL}/users/register`,
+        `${baseURL}/users/signup`,
         JSON.stringify(registerInfor)
       );
 

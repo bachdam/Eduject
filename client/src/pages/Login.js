@@ -9,6 +9,8 @@ import logo from "images/U.png";
 import googleIconImageSrc from "images/google-icon.png";
 import twitterIconImageSrc from "images/twitter-icon.png";
 import { ReactComponent as LoginIcon } from "feather-icons/dist/icons/log-in.svg";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const Container = tw(
   ContainerBase
@@ -60,46 +62,77 @@ export default ({
   SubmitButtonIcon = LoginIcon,
   forgotPasswordUrl = "#",
   signupUrl = "/signup",
-}) => (
-  <AnimationRevealPage>
-    <Container>
-      <Content>
-        <MainContainer>
-          <LogoLink href={logoLinkUrl}>
-            <LogoImage src={logo} />
-          </LogoLink>
-          <MainContent>
-            <Heading>{headingText}</Heading>
-            <FormContainer>
-              <Form>
-                <Input type="email" placeholder="Email" />
-                <Input type="password" placeholder="Password" />
-                <SubmitButton type="submit">
-                  <SubmitButtonIcon className="icon" />
-                  <span className="text">{submitButtonText}</span>
-                </SubmitButton>
-              </Form>
-              <p tw="mt-6 text-xs text-gray-600 text-center">
-                <a
-                  href={forgotPasswordUrl}
-                  tw="border-b border-gray-500 border-dotted"
-                >
-                  Forgot Password ?
-                </a>
-              </p>
-              <p tw="mt-8 text-sm text-gray-600 text-center">
-                Dont have an account?{" "}
-                <a href={signupUrl} tw="border-b border-gray-500 border-dotted">
-                  Sign Up
-                </a>
-              </p>
-            </FormContainer>
-          </MainContent>
-        </MainContainer>
-        <IllustrationContainer>
-          <IllustrationImage imageSrc={illustrationImageSrc} />
-        </IllustrationContainer>
-      </Content>
-    </Container>
-  </AnimationRevealPage>
-);
+}) => {
+  const {
+    loginError,
+    loginInfor,
+    loginUser,
+    isLoginLoading,
+    updateLoginInfor,
+    logoutUser,
+  } = useContext(AuthContext);
+  return (
+    <AnimationRevealPage>
+      <Container>
+        <Content>
+          <MainContainer>
+            <LogoLink href={logoLinkUrl}>
+              <LogoImage src={logo} />
+            </LogoLink>
+            <MainContent>
+              <Heading>{headingText}</Heading>
+              <FormContainer>
+                <Form onSubmit={loginUser}>
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    onChange={(e) =>
+                      updateLoginInfor({ ...loginInfor, email: e.target.value })
+                    }
+                  />
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    onChange={(e) =>
+                      updateLoginInfor({
+                        ...loginInfor,
+                        password: e.target.value,
+                      })
+                    }
+                  />
+                  <SubmitButton type="submit">
+                    <SubmitButtonIcon className="icon" />
+                    <span className="text">{submitButtonText}</span>
+                  </SubmitButton>
+                  {loginError?.error && (
+                    <p tw="text-red-500">{loginError?.message}</p>
+                  )}
+                </Form>
+                <p tw="mt-6 text-xs text-gray-600 text-center">
+                  <a
+                    href={forgotPasswordUrl}
+                    tw="border-b border-gray-500 border-dotted"
+                  >
+                    Forgot Password ?
+                  </a>
+                </p>
+                <p tw="mt-8 text-sm text-gray-600 text-center">
+                  Dont have an account?{" "}
+                  <a
+                    href={signupUrl}
+                    tw="border-b border-gray-500 border-dotted"
+                  >
+                    Sign Up
+                  </a>
+                </p>
+              </FormContainer>
+            </MainContent>
+          </MainContainer>
+          <IllustrationContainer>
+            <IllustrationImage imageSrc={illustrationImageSrc} />
+          </IllustrationContainer>
+        </Content>
+      </Container>
+    </AnimationRevealPage>
+  );
+};
