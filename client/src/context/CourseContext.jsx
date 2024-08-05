@@ -269,3 +269,42 @@ export const ChatContextProvider = ({ children, user }) => {
     </ChatContext.Provider>
   );
 };
+
+// // CourseContext.jsx  
+// import React, { createContext, useState } from 'react';  
+  
+// // Create the CourseContext  
+// export const CourseContext = createContext();  
+  
+// // Create the CourseProvider  
+// export const CourseProvider = ({ children }) => {  
+//     // State to hold courses  
+//     const [courses, setCourses] = useState([]);  
+  
+//     // Function to add a new course  
+//     const addCourse = (course) => {  
+//         setCourses((prevCourses) => [...prevCourses, course]);  
+//     };  
+  
+//     // Function to remove a course  
+//     const removeCourse = (courseId) => {  
+//         setCourses((prevCourses) => prevCourses.filter(course => course.id !== courseId));  
+//     };  
+  
+//     // Function to fetch courses (mock implementation)  
+//     const fetchCourses = () => {  
+//         // Here you would typically make an API call to get courses.  
+//         // For this example, let's use some mock data.  
+//         const mockCourses = [  
+//             { id: 1, title: 'Introduction to React' },  
+//             { id: 2, title: 'Advanced JavaScript' },  
+//         ];  
+//         setCourses(mockCourses);  
+//     };  
+  
+//     return (  
+//         <CourseContext.Provider value={{ courses, addCourse, removeCourse, fetchCourses }}>  
+//             {children}  
+//         </CourseContext.Provider>  
+//     );  
+// };  
