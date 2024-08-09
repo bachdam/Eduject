@@ -203,3 +203,32 @@ export default ({
     </AnimationRevealPage>
   );
 };
+
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(401).json({ error: "Invalid email or password!" });
+  } else {
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ error: "Invalid email or password!" });
+    } else {
+      // Create a token if you need to manage sessions
+      const token = jwt.sign({ _id: user._id }, process.env.Secrete);
+
+      // Return user data along with the token
+      res.status(200).json({
+        message: "Login succeeded!",
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          // Include other necessary fields
+        },
+        token, // Send token if required
+      });
+    }
+  }
+};

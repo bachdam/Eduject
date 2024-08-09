@@ -23,11 +23,18 @@ export const AuthContextProvider = ({ children }) => {
   console.log("User", user);
   console.log("loginInfor", loginInfor);
 
-  useEffect(() => {
-    const user = localStorage.getItem("User");
+  useEffect(() => {  
+    const storedUser = localStorage.getItem("User");  
+    if (storedUser) {  
+        try {  
+          setUser(JSON.parse(storedUser));  
+        } catch (error) {  
+            console.error( error);  
+            // localStorage.removeItem("User");  
+        }  
+    }  
+}, []);  
 
-    setUser(JSON.parse(user));
-  }, []);
 
   //   this is a hook to update the register data without refreshing everytime we render
   // the infor here is the input data of the Register form
@@ -75,9 +82,9 @@ export const AuthContextProvider = ({ children }) => {
 
       setIsLoginLoading(false);
 
-      if (response.error) {
-        return setLoginError(response);
-      }
+      // if (response.error) {
+      //   return setLoginError(response);
+      // }
 
       localStorage.setItem("User", JSON.stringify(response));
       setUser(response);
