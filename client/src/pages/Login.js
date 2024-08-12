@@ -105,9 +105,7 @@ export default ({
                       {isLoginLoading ? "Loading..." : "Sign In"}
                     </span>
                   </SubmitButton>
-                  {loginError?.error && (
-                    <p tw="text-red-500">{loginError?.message}</p>
-                  )}
+                  {loginError && <p tw="text-red-500">{loginError}</p>}
                 </Form>
                 <p tw="mt-6 text-xs text-gray-600 text-center">
                   <a

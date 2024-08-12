@@ -38,56 +38,72 @@ export const AuthContextProvider = ({ children }) => {
 
   //   this is a hook to update the register data without refreshing everytime we render
   // the infor here is the input data of the Register form
-  const updateRegisterInfor = useCallback((infor) => {
-    setRegisterInfor(infor);
-  }, []);
+  // const updateRegisterInfor = useCallback((infor) => {
+  //   setRegisterInfor(infor);
+  // }, []);
 
   const updateLoginInfor = useCallback((infor) => {
     setLoginInfor(infor);
   }, []);
 
   //a function to let us register a user; we need to add event "e" to prevent the auto refreshing whenever we click submit in Regiser.jsx.
-  const registerUser = useCallback(
-    async (e) => {
-      e.preventDefault();
-      setIsRegisterLoading(true);
-      setRegisterError(null);
-      const response = await postRequest(
-        `${baseURL}/users/signup`,
-        JSON.stringify(registerInfor)
-      );
+  // const registerUser = useCallback(
+  //   async (e) => {
+  //     e.preventDefault();
+  //     setIsRegisterLoading(true);
+  //     setRegisterError(null);
+  //     const response = await postRequest(
+  //       `${baseURL}/users/signup`,
+  //       JSON.stringify(registerInfor)
+  //     );
 
-      setIsRegisterLoading(false);
+  //     setIsRegisterLoading(false);
 
-      if (response.error) {
-        return setRegisterError(response);
-      }
+  //     if (response.error) {
+  //       return setRegisterError(response);
+  //     }
 
-      //this will keep the user login whenever we refresh the page
-      localStorage.setItem("User", JSON.stringify(response));
-      setUser(response);
-    },
-    [registerInfor]
-  );
+  //     //this will keep the user login whenever we refresh the page
+  //     localStorage.setItem("User", JSON.stringify(response));
+  //     setUser(response);
+  //   },
+  //   [registerInfor]
+  // );
 
   const loginUser = useCallback(
     async (e) => {
       e.preventDefault();
       setIsLoginLoading(true);
       setLoginError(null);
-      const response = await postRequest(
-        `${baseURL}/users/login`,
-        JSON.stringify(loginInfor)
-      );
 
-      setIsLoginLoading(false);
+      if (!loginInfor.email || !loginInfor.password) {
+        return setLoginError("Email and Password are required.");
+      }
 
-      // if (response.error) {
-      //   return setLoginError(response);
-      // }
+      try {
+        const response = await fetch(`${baseURL}/users/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(loginInfor),
+        });
 
-      localStorage.setItem("User", JSON.stringify(response));
-      setUser(response);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Login failed.");
+        }
+
+        const userData = await response.json();
+        localStorage.setItem("User", JSON.stringify(userData.user));
+        setUser(response);
+        window.location.href = "/"; // Navigate using window.location
+      } catch (error) {
+        console.error("Login failed:", error.message);
+        setLoginError(error.message);
+      } finally {
+        setIsLoginLoading(false);
+      }
     },
     [loginInfor]
   );
@@ -102,9 +118,9 @@ export const AuthContextProvider = ({ children }) => {
       value={{
         user,
         registerInfor,
-        updateRegisterInfor,
+        
         registerError,
-        registerUser,
+        
         isRegisterLoading,
         logoutUser,
         loginError,

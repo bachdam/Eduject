@@ -76,6 +76,17 @@ import twitterIconImageSrc from "images/twitter-icon.png";
 import { ReactComponent as LoginIcon } from "feather-icons/dist/icons/log-in.svg";
 import axios from "axios";
 
+// combinedAuthComponent.js
+import React, { useState, useCallback } from "react";
+import AnimationRevealPage from "helpers/AnimationRevealPage.js";
+import { Container as ContainerBase } from "components/misc/Layouts";
+import tw from "twin.macro";
+import styled from "styled-components";
+import { ReactComponent as LoginIcon } from "feather-icons/dist/icons/log-in.svg";
+import illustration from "images/login-illustration.svg";
+import logo from "images/U.png";
+import { baseURL } from "../utils/services";
+
 const Container = tw(
   ContainerBase
 )`min-h-screen bg-teal-900 text-white font-medium flex justify-center -m-8`;
@@ -86,21 +97,6 @@ const LogoImage = tw.img`h-12 mx-auto`;
 const MainContent = tw.div`mt-12 flex flex-col items-center`;
 const Heading = tw.h1`text-2xl xl:text-3xl font-extrabold`;
 const FormContainer = tw.div`w-full flex-1 mt-8`;
-
-const SocialButtonsContainer = tw.div`flex flex-col items-center`;
-const SocialButton = styled.a`
-  ${tw`w-full max-w-xs font-semibold rounded-lg py-3 border text-gray-900 bg-gray-100 hocus:bg-gray-200 hocus:border-gray-400 flex items-center justify-center transition-all duration-300 focus:outline-none focus:shadow-outline text-sm mt-5 first:mt-0`}
-  .iconContainer {
-    ${tw`bg-white p-2 rounded-full`}
-  }
-  .icon {
-    ${tw`w-4`}
-  }
-  .text {
-    ${tw`ml-4`}
-  }
-`;
-
 const Form = tw.form`mx-auto max-w-xs`;
 const Input = tw.input`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`;
 const SubmitButton = styled.button`
@@ -118,77 +114,90 @@ const IllustrationImage = styled.div`
   ${tw`m-12 xl:m-16 w-full max-w-sm bg-contain bg-center bg-no-repeat`}
 `;
 
-export default ({
-  logoLinkUrl = "/",
-  illustrationImageSrc = illustration,
-  headingText = "Sign In To Eduject",
-  submitButtonText = "Sign In",
-  SubmitButtonIcon = LoginIcon,
-  forgotPasswordUrl = "#",
-  signupUrl = "/signup",
-}) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setError] = useState("");
+const CombinedAuthComponent = () => {
+  const [loginInfor, setLoginInfor] = useState({ email: "", password: "" });
+  const [loginError, setLoginError] = useState(null);
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(`http://localhost:8080/api/login`, {
-        email: email,
-        password: password,
-      });
-      const { user } = response.data;
-      console.log(response.data);
-      localStorage.setItem("user", JSON.stringify(user));
-    } catch (error) {
-      setError("Invalid email or password!");
-    }
-  };
+  const loginUser = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setIsLoginLoading(true);
+      setLoginError(null);
+
+      if (!loginInfor.email || !loginInfor.password) {
+        return setLoginError("Email and Password are required.");
+      }
+
+      try {
+        const response = await fetch(`${baseURL}/users/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(loginInfor),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Login failed.");
+        }
+
+        const userData = await response.json();
+        localStorage.setItem("User", JSON.stringify(userData.user));
+        window.location.href = "/home"; // Navigate using window.location
+      } catch (error) {
+        console.error("Login failed:", error.message);
+        setLoginError(error.message);
+      } finally {
+        setIsLoginLoading(false);
+      }
+    },
+    [loginInfor]
+  );
+
   return (
     <AnimationRevealPage>
       <Container>
         <Content>
           <MainContainer>
-            <LogoLink href={logoLinkUrl}>
+            <LogoLink href="/">
               <LogoImage src={logo} />
             </LogoLink>
             <MainContent>
-              <Heading>{headingText}</Heading>
-              {errorMessage && <p tw="text-red-500">{errorMessage}</p>}
+              <Heading>Sign In To Eduject</Heading>
               <FormContainer>
-                <Form onSubmit={handleLogin}>
+                <Form onSubmit={loginUser}>
                   <Input
                     type="email"
                     placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) =>
+                      setLoginInfor({ ...loginInfor, email: e.target.value })
+                    }
                   />
                   <Input
                     type="password"
                     placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) =>
+                      setLoginInfor({ ...loginInfor, password: e.target.value })
+                    }
                   />
-                  <SubmitButton type="submit">
-                    <SubmitButtonIcon className="icon" />
-                    <span className="text">{submitButtonText}</span>
+                  <SubmitButton type="submit" disabled={isLoginLoading}>
+                    <LoginIcon className="icon" />
+                    <span className="text">
+                      {isLoginLoading ? "Loading..." : "Sign In"}
+                    </span>
                   </SubmitButton>
+                  {loginError && <p tw="text-red-500">{loginError}</p>}
                 </Form>
                 <p tw="mt-6 text-xs text-gray-600 text-center">
-                  <a
-                    href={forgotPasswordUrl}
-                    tw="border-b border-gray-500 border-dotted"
-                  >
-                    Forgot Password ?
+                  <a href="#" tw="border-b border-gray-500 border-dotted">
+                    Forgot Password?
                   </a>
                 </p>
                 <p tw="mt-8 text-sm text-gray-600 text-center">
                   Dont have an account?{" "}
-                  <a
-                    href={signupUrl}
-                    tw="border-b border-gray-500 border-dotted"
-                  >
+                  <a href="/signup" tw="border-b border-gray-500 border-dotted">
                     Sign Up
                   </a>
                 </p>
@@ -196,11 +205,149 @@ export default ({
             </MainContent>
           </MainContainer>
           <IllustrationContainer>
-            <IllustrationImage imageSrc={illustrationImageSrc} />
+            <IllustrationImage imageSrc={illustration} />
           </IllustrationContainer>
         </Content>
       </Container>
     </AnimationRevealPage>
+  );
+};
+
+export default CombinedAuthComponent;
+//authcontext
+import { createContext, useCallback, useEffect, useState } from "react";
+import { postRequest, baseURL } from "../utils/services";
+
+export const AuthContext = createContext();
+
+export const AuthContextProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [registerError, setRegisterError] = useState(null);
+  const [isRegisterLoading, setIsRegisterLoading] = useState(false);
+  const [registerInfor, setRegisterInfor] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+
+  const [loginError, setLoginError] = useState(null);
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
+  const [loginInfor, setLoginInfor] = useState({
+    email: "",
+    password: "",
+  });
+
+  console.log("User", user);
+  console.log("loginInfor", loginInfor);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("User");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error(error);
+        // localStorage.removeItem("User");
+      }
+    }
+  }, []);
+
+  //   this is a hook to update the register data without refreshing everytime we render
+  // the infor here is the input data of the Register form
+  const updateRegisterInfor = useCallback((infor) => {
+    setRegisterInfor(infor);
+  }, []);
+
+  const updateLoginInfor = useCallback((infor) => {
+    setLoginInfor(infor);
+  }, []);
+
+  //a function to let us register a user; we need to add event "e" to prevent the auto refreshing whenever we click submit in Regiser.jsx.
+  const registerUser = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setIsRegisterLoading(true);
+      setRegisterError(null);
+      const response = await postRequest(
+        `${baseURL}/users/signup`,
+        JSON.stringify(registerInfor)
+      );
+
+      setIsRegisterLoading(false);
+
+      if (response.error) {
+        return setRegisterError(response);
+      }
+
+      //this will keep the user login whenever we refresh the page
+      localStorage.setItem("User", JSON.stringify(response));
+      setUser(response);
+    },
+    [registerInfor]
+  );
+
+  const loginUser = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setIsLoginLoading(true);
+      setLoginError(null);
+
+      if (!loginInfor.email || !loginInfor.password) {
+        return setLoginError("Email and Password are required.");
+      }
+
+      try {
+        const response = await fetch(`${baseURL}/users/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(loginInfor),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Login failed.");
+        }
+
+        const userData = await response.json();
+        localStorage.setItem("User", JSON.stringify(userData.user));
+        setUser(response);
+        window.location.href = "/"; // Navigate using window.location
+      } catch (error) {
+        console.error("Login failed:", error.message);
+        setLoginError(error.message);
+      } finally {
+        setIsLoginLoading(false);
+      }
+    },
+    [loginInfor]
+  );
+
+  const logoutUser = useCallback(() => {
+    localStorage.removeItem("User");
+    setUser(null);
+  }, []);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        registerInfor,
+        updateRegisterInfor,
+        registerError,
+        registerUser,
+        isRegisterLoading,
+        logoutUser,
+        loginError,
+        loginInfor,
+        loginUser,
+        isLoginLoading,
+        updateLoginInfor,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
 };
 
