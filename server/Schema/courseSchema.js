@@ -8,6 +8,7 @@ const CourseSchema = new mongoose.Schema({
   categories: [String],
   price: { type: Number, required: true },
   intro: { type: String, min: 40 },
+  user_list: [String],
   // detail: { type: String, require: true },
 });
 

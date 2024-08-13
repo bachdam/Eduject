@@ -19,6 +19,7 @@ export const AuthContextProvider = ({ children }) => {
     email: "",
     password: "",
   });
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
 
   console.log("User", user);
   console.log("loginInfor", loginInfor);
@@ -34,6 +35,14 @@ export const AuthContextProvider = ({ children }) => {
         }  
     }  
 }, []);  
+
+  useEffect(() => {  
+    const token = localStorage.getItem('token');  
+    if (token) {  
+      setIsLoggedIn(true); // User is logged in  
+    }  
+    console.log("token from Local:", token)
+  }, []);
 
 
   //   this is a hook to update the register data without refreshing everytime we render
@@ -99,9 +108,17 @@ export const AuthContextProvider = ({ children }) => {
         const userData = await response.json();
         console.log("User Data from API:", userData);
 
+        //save user and token to local storage
         localStorage.setItem("User", JSON.stringify(userData.name));
-        const abc = localStorage.getItem("User");
-        console.log("user in localSto:", abc)
+        localStorage.setItem("Token", userData.token);
+
+        //user infor
+        const userInfo = localStorage.getItem("User");
+        console.log("user in localSto:", userInfo)
+
+        //user token
+        const userToken = localStorage.getItem("Token");
+        console.log('Login successful! Token stored:', userToken);
         setUser(userData.name);
         window.location.href = "/"; // Navigate using window.location
         
@@ -117,7 +134,9 @@ export const AuthContextProvider = ({ children }) => {
 
   const logoutUser = useCallback(() => {
     localStorage.removeItem("User");
+    localStorage.removeItem("Token");
     setUser(null);
+    setIsLoggedIn(false);
   }, []);
 
   return (
@@ -135,6 +154,7 @@ export const AuthContextProvider = ({ children }) => {
         loginUser,
         isLoginLoading,
         updateLoginInfor,
+        isLoggedIn
       }}
     >
       {children}

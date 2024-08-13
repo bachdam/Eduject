@@ -77,21 +77,22 @@ export default ({
    * changing the defaultLinks variable below below.
    * If you manipulate links here, all the styling on the links is already done for you. If you pass links yourself though, you are responsible for styling the links or use the helper styled components that are defined here (NavLink)
    */
-  const { user, logoutUser } = useContext(AuthContext);
+  const { isLoggedIn, logoutUser } = useContext(AuthContext);
   const defaultLinks = [
     <NavLinks key={1}>
       <NavLink href="/about">About</NavLink>
       <NavLink href="/blog">Blog</NavLink>
       <NavLink href="/courses">Courses</NavLink>
       <NavLink href="/contact">Contact Us</NavLink>
-      {user && (
+      {console.log("login?", isLoggedIn)}
+      {isLoggedIn && (
         <div>
           <NavLink onClick={() => logoutUser()} to="/login" tw="lg:ml-12!">
             Logout
           </NavLink>
         </div>
       )}
-      {!user && (
+      {!isLoggedIn && (
         <div>
           <NavLink href="/login" tw="lg:ml-12!">
             Login
