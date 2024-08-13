@@ -351,31 +351,147 @@ export const AuthContextProvider = ({ children }) => {
   );
 };
 
-const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+import React, { useState, useEffect } from 'react';  
+import axios from 'axios';  
+  
+const AuthComponent = () => {  
+  const [email, setEmail] = useState('');  
+  const [password, setPassword] = useState('');  
+  const [isLoggedIn, setIsLoggedIn] = useState(false);  
+  
+  // Check on initial render if the user is already logged in  
+  useEffect(() => {  
+    const token = localStorage.getItem('token');  
+    if (token) {  
+      setIsLoggedIn(true); // User is logged in  
+    }  
+  }, []);  
+  
+  const handleSignup = async (e) => {  
+    e.preventDefault();  
+    try {  
+      const response = await axios.post('http://localhost:3000/signup', { email, password });  
+      console.log(response.data.message);  
+    } catch (err) {  
+      console.error(err.response?.data?.message || 'Error during signup');  
+    }  
+  };  
+  
+  const handleLogin = async (e) => {  
+    e.preventDefault();  
+    try {  
+      const response = await axios.post('http://localhost:3000/login', { email, password });  
+      localStorage.setItem('token', response.data.token);  
+      setIsLoggedIn(true); // Set loggedIn state to true  
+      console.log('Login successful! Token stored:', response.data.token);  
+    } catch (err) {  
+      console.error(err.response?.data?.message || 'Error during login');  
+    }  
+  };  
+  
+  const fetchProtectedData = async () => {  
+    const token = localStorage.getItem('token');  
+    try {  
+      const response = await axios.get('http://localhost:3000/protected', {  
+        headers: {  
+          'Authorization': `Bearer ${token}`  
+        }  
+      });  
+      console.log(response.data);  
+    } catch (error) {  
+      console.error('Access denied:', error.response?.data?.message);  
+      setIsLoggedIn(false); // Log user out if token is invalid  
+      localStorage.removeItem('token'); // Clear token if it's invalid   
+    }  
+  };  
+  
+  return (  
+    <div>  
+      {!isLoggedIn ? (  
+        <>  
+          <form onSubmit={handleSignup}>  
+            <h2>Sign Up</h2>  
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" required />  
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" required />  
+            <button type="submit">Sign Up</button>  
+          </form>  
+  
+          <form onSubmit={handleLogin}>  
+            <h2>Login</h2>  
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" required />  
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" required />  
+            <button type="submit">Log In</button>  
+          </form>  
+        </>  
+      ) : (  
+        <div>  
+          <h2>Welcome back!</h2>  
+          <button onClick={fetchProtectedData}>Fetch Protected Data</button>  
+          <button onClick={() => {  
+            // Handle logout  
+            setIsLoggedIn(false);  
+            localStorage.removeItem('token');  
+          }}>Logout</button>  
+        </div>  
+      )}  
+    </div>  
+  );  
+};  
+  
+export default AuthComponent;  
 
-  const user = await User.findOne({ email });
-  if (!user) {
-    return res.status(401).json({ error: "Invalid email or password!" });
-  } else {
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect) {
-      return res.status(401).json({ error: "Invalid email or password!" });
-    } else {
-      // Create a token if you need to manage sessions
-      const token = jwt.sign({ _id: user._id }, process.env.Secrete);
 
-      // Return user data along with the token
-      res.status(200).json({
-        message: "Login succeeded!",
-        user: {
-          id: user._id,
-          username: user.username,
-          email: user.email,
-          // Include other necessary fields
-        },
-        token, // Send token if required
-      });
+//succeed authcontext.js
+const loginUser = useCallback(
+  async (e) => {
+    e.preventDefault();
+    setIsLoginLoading(true);
+    setLoginError(null);
+
+    if (!loginInfor.email || !loginInfor.password) {
+      return setLoginError("Email and Password are required.");
     }
-  }
-};
+
+    try {
+      const response = await fetch(`${baseURL}/users/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginInfor),
+      });
+
+      // Log the raw response for debugging
+      console.log("Raw response:", response);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Login failed.");
+      }
+
+      // Now, parse the JSON data once you are sure the response is okay
+      const userData = await response.json();
+      console.log("User Data from API:", userData); // Log user data retrieved from API
+
+      // Check if userData.user is defined
+      if (userData) {
+        localStorage.setItem("User", JSON.stringify(userData.name));
+        const storedUser = localStorage.getItem("User");
+        console.log("User stored in localStorage:", storedUser);
+
+        // Set the user state with the actual user data
+        setUser(userData.user); // Make sure to extract the user correctly
+        window.location.href = "/"; // Navigate after successful login
+      } else {
+        console.error("User data is not defined in the response.");
+        setLoginError("Login failed, no user data returned.");
+      }
+    } catch (error) {
+      console.error("Login failed:", error.message);
+      setLoginError(error.message);
+    } finally {
+      setIsLoginLoading(false); // Make sure loading state is reset
+    }
+  },
+  [loginInfor]
+);

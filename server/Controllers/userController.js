@@ -4,9 +4,9 @@ const jwt = require("jsonwebtoken");
 const User = require("../Schema/userSchema");
 
 //token
-const token = (_id) => {
+const createToken = (_id) => {
   jwtKey = process.env.Secrete;
-  jwt.sign({ _id }, jwtKey);
+  return jwt.sign({ _id }, jwtKey);
 };
 
 //signup user
@@ -47,26 +47,36 @@ const createUser = async (req, res) => {
     num_of_courses,
   });
 
-  newUser.save();
-  res.status(200).json(newUser);
+  await newUser.save();
+  const token = createToken(user._id);
+  res.status(200).json({ _id: user._id, username, email, token });
 };
 
 //login user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
-  if (!user) {
-    return res.status(401).json("Invalid email or password!");
-  } else {
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json("Invalid email or password!");
+    }
+
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
     if (!isPasswordCorrect) {
       return res
         .status(401)
         .json(`Invalid email or password! ${password}:${user.password}`);
-    } else {
-      res.status(200).json("Login successed!");
     }
+
+    //if login success, create token
+    const token = createToken(user._id);
+    res.status(200).json({ _id: user._id, name: user.username, email, token });
+    console.log("token:", token);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json(e);
   }
 };
 

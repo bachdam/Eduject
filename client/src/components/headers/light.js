@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { motion } from "framer-motion";
 import tw from "twin.macro";
 import styled from "styled-components";
@@ -9,6 +9,7 @@ import useAnimatedNavToggler from "../../helpers/useAnimatedNavToggler.js";
 import logo from "../../images/E.png";
 import { ReactComponent as MenuIcon } from "feather-icons/dist/icons/menu.svg";
 import { ReactComponent as CloseIcon } from "feather-icons/dist/icons/x.svg";
+import { AuthContext } from "context/AuthContext.jsx";
 
 const Header = tw.header`
   flex justify-between items-center
@@ -76,18 +77,33 @@ export default ({
    * changing the defaultLinks variable below below.
    * If you manipulate links here, all the styling on the links is already done for you. If you pass links yourself though, you are responsible for styling the links or use the helper styled components that are defined here (NavLink)
    */
+  const { user, logoutUser } = useContext(AuthContext);
   const defaultLinks = [
     <NavLinks key={1}>
       <NavLink href="/about">About</NavLink>
       <NavLink href="/blog">Blog</NavLink>
       <NavLink href="/courses">Courses</NavLink>
       <NavLink href="/contact">Contact Us</NavLink>
-      <NavLink href="/login" tw="lg:ml-12!">
-        Login
-      </NavLink>
-      <PrimaryLink css={roundedHeaderButton && tw`rounded-full`} href="/signup">
-        Sign Up
-      </PrimaryLink>
+      {user && (
+        <div>
+          <NavLink onClick={() => logoutUser()} to="/login" tw="lg:ml-12!">
+            Logout
+          </NavLink>
+        </div>
+      )}
+      {!user && (
+        <div>
+          <NavLink href="/login" tw="lg:ml-12!">
+            Login
+          </NavLink>
+          <PrimaryLink
+            css={roundedHeaderButton && tw`rounded-full`}
+            href="/signup"
+          >
+            Sign Up
+          </PrimaryLink>
+        </div>
+      )}
     </NavLinks>,
   ];
 

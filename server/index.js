@@ -7,6 +7,7 @@ const port = process.env.PORT || 8080;
 const atlasURL = process.env.ATLAS_URI;
 const routeCourse = require("./routes/routeCourse");
 const routeLesson = require("./routes/routeLesson");
+const protectedRoute = require("./routes/protectedRoute");
 
 const app = express();
 app.use(
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/users", routeUser);
 app.use("/api/courses", routeCourse);
 app.use("/api/lessons", routeLesson);
+app.use("/api/protected", protectedRoute);
 
 app.get("/", (req, res) => {
   res.send("Hello from backend");
