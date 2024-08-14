@@ -27,12 +27,15 @@ export const AuthContextProvider = ({ children }) => {
 
   useEffect(() => {  
     const user = localStorage.getItem("User");  
+    const role = localStorage.getItem("Role"); 
     if (user) {  
         try {  
           setUser(JSON.parse(user));  
+          setRole(JSON.parse(role)); 
         } catch (error) {  
             console.error( error);  
             localStorage.removeItem("User");  
+            localStorage.removeItem("Role");
         }  
     }  
 }, []);  
@@ -111,6 +114,7 @@ export const AuthContextProvider = ({ children }) => {
 
         //save user and token to local storage
         localStorage.setItem("User", JSON.stringify(userData.name));
+        localStorage.setItem("Role", JSON.stringify(userData.role));
         localStorage.setItem("Token", JSON.stringify(userData.token));
 
         //user infor
@@ -121,6 +125,7 @@ export const AuthContextProvider = ({ children }) => {
         const userToken = localStorage.getItem("Token");
         console.log('Login successful! Token stored:', userToken);
         setUser(userData.name);
+        setRole(userData.role);
         window.location.href = "/"; // Navigate using window.location
         
       } catch (error) {
@@ -136,7 +141,9 @@ export const AuthContextProvider = ({ children }) => {
   const logoutUser = useCallback(() => {
     localStorage.removeItem("User");
     localStorage.removeItem("Token");
+    localStorage.removeItem("Role");
     setUser(null);
+    setRole(null);
     setIsLoggedIn(false);
   }, []);
 
@@ -144,6 +151,7 @@ export const AuthContextProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
+        role,
         registerInfor,
         updateRegisterInfor,
         registerError,

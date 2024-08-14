@@ -157,3 +157,78 @@
     width: 100%;
     bottom: 0;
 }
+
+
+/* basic user */
+/* General body styles */  
+  
+/* Main container for user greeting and courses list */  
+.basic_user div {  
+    max-width: 100%; /* Increase max-width for larger screens */  
+    margin: 5px 2px; /* Center the div horizontally with margin */  
+    padding: 20px;  
+    border-radius: 8px; /* Smooth rounded corners */  
+}  
+  
+/* Greeting heading */  
+.basic_user h1 {  
+    text-align: center; /* Center align the heading */  
+    color: #333; /* Darker text color for contrast */  
+}  
+  
+/* Courses list container using Grid */  
+.basic_user .user_courses_list {  
+    display: grid; /* Use grid for layout */  
+    grid-template-columns: repeat(4, 1fr); /* 4 columns on large screens */  
+    gap: 20px; /* Space between cards */  
+    margin-top: 20px; /* Space above the course list */  
+}  
+  
+/* Individual course card */  
+.basic_user .course {  
+    background-color: #f9f9f9; /* Light grey background for course cards */  
+    border: 1px solid #ddd; /* Light border around course cards */  
+    border-radius: 5px; /* Rounded corners for cards */  
+    padding: 15px; /* Padding inside the card */  
+    transition: transform 0.2s; /* Smooth transform transition */  
+    cursor: pointer; /* Pointer cursor on hover */  
+}  
+  
+/* Hover effect for course cards */  
+.basic_user .course:hover {  
+    transform: scale(1.05); /* Slightly enlarge card on hover */  
+    border-color: #007BFF; /* Change border color on hover */  
+}  
+  
+/* Course title */  
+.basic_user .course h2 {  
+    margin: 0 0 10px 0; /* Spacing below the title */  
+    font-size: 1.2em; /* Increase title size */  
+    color: #007BFF; /* Color for the title */  
+}  
+  
+/* Course description */  
+.basic_user .course p {  
+    margin: 0; /* Remove default margins */  
+    font-size: 0.9em; /* Smaller font size for description */  
+    color: #666; /* Grey text for description */  
+}  
+  
+/* Responsive styles */  
+@media (max-width: 1024px) {  
+    .basic_user .user_courses_list {  
+        grid-template-columns: repeat(3, 1fr); /* 3 columns on medium screens */  
+    }  
+}  
+  
+@media (max-width: 768px) {  
+    .basic_user .user_courses_list {  
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on small screens */  
+    }  
+}  
+  
+@media (max-width: 480px) {  
+    .basic_user .user_courses_list {  
+        grid-template-columns: 1fr; /* 1 column on extra small screens */  
+    }  
+}  

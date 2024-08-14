@@ -22,6 +22,7 @@ const CoursesPage = () => {
 
   console.log("User in COurse Page: ", user);
   console.log("User role in COurse Page: ", role);
+
   const createCourse = async (e) => {
     e.preventDefault();
     try {
@@ -89,6 +90,10 @@ const CoursesPage = () => {
     fetchCourses();
   }, []);
 
+  const handleUserChoice = (courseId) => {
+    navigate(`/courses/${courseId}/lessons`);
+  };
+
   //display all the courses from db to the screen
   let list = coursesList.map((item) => {
     console.log(item.title);
@@ -98,103 +103,126 @@ const CoursesPage = () => {
       </button>
     );
   });
+
+  const user_course_list = coursesList.map((item) => (
+    <div
+      className="course"
+      key={item.id}
+      onClick={() => handleUserChoice(item._id)}
+    >
+      <h2>{item.title}</h2>
+      <p>
+        {item.intro
+          ? item.intro.substring(0, 20) + (item.intro.length > 20 ? "..." : "")
+          : "No description available"}
+      </p>
+    </div>
+  ));
   return (
     <div>
       <Header />
-
-      <div>
-        <div className="wrapper">
-          <div className="courses_list">{list}</div>
-          <form>
-            <h1>New Course</h1>
-            <hr className="sep" />
-            <div className="group">
-              <input
-                type="text"
-                required
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-              <span className="highlight"></span>
-              <span className="bar"></span>
-              <label>Title</label>
-            </div>
-            <div className="group">
-              <input
-                type="text"
-                required
-                value={instructor}
-                onChange={(e) => setInstructor(e.target.value)}
-              />
-              <span className="highlight"></span>
-              <span className="bar"></span>
-              <label>Instructor</label>
-            </div>
-            <div className="group">
-              <input
-                type="text"
-                required
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
-              <span className="highlight"></span>
-              <span className="bar"></span>
-              <label>Price</label>
-            </div>
-            <div className="group">
-              <input
-                type="text"
-                required
-                value={language}
-                onChange={(e) =>
-                  setLanguage(
-                    e.target.value.split(",").map((lan) => lan.trim())
-                  )
-                }
-              />
-              <span className="highlight"></span>
-              <span className="bar"></span>
-              <label>Language</label>
-            </div>
-            <div className="group">
-              <input
-                type="text"
-                required
-                value={categories}
-                onChange={(e) =>
-                  setCategories(
-                    e.target.value.split(",").map((cat) => cat.trim())
-                  )
-                }
-              />
-              <span className="highlight"></span>
-              <span className="bar"></span>
-              <label>Categories</label>
-            </div>
-            <div className="group">
-              <textarea
-                type="textarea"
-                rows="5"
-                required
-                value={intro}
-                onChange={(e) => setIntro(e.target.value)}
-              />
-              <span className="highlight"></span>
-              <span className="bar"></span>
-              <label>Introduction</label>
-            </div>
-            <div className="btn-box">
-              <button
-                className="btn btn-submit"
-                type="button"
-                onClick={createCourse}
-              >
-                Submit
-              </button>
-            </div>
-          </form>
+      {role == "Admin" && (
+        <div>
+          <div className="wrapper">
+            <div className="courses_list">{list}</div>
+            <form>
+              <h1>New Course</h1>
+              <hr className="sep" />
+              <div className="group">
+                <input
+                  type="text"
+                  required
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+                <span className="highlight"></span>
+                <span className="bar"></span>
+                <label>Title</label>
+              </div>
+              <div className="group">
+                <input
+                  type="text"
+                  required
+                  value={instructor}
+                  onChange={(e) => setInstructor(e.target.value)}
+                />
+                <span className="highlight"></span>
+                <span className="bar"></span>
+                <label>Instructor</label>
+              </div>
+              <div className="group">
+                <input
+                  type="text"
+                  required
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                />
+                <span className="highlight"></span>
+                <span className="bar"></span>
+                <label>Price</label>
+              </div>
+              <div className="group">
+                <input
+                  type="text"
+                  required
+                  value={language}
+                  onChange={(e) =>
+                    setLanguage(
+                      e.target.value.split(",").map((lan) => lan.trim())
+                    )
+                  }
+                />
+                <span className="highlight"></span>
+                <span className="bar"></span>
+                <label>Language</label>
+              </div>
+              <div className="group">
+                <input
+                  type="text"
+                  required
+                  value={categories}
+                  onChange={(e) =>
+                    setCategories(
+                      e.target.value.split(",").map((cat) => cat.trim())
+                    )
+                  }
+                />
+                <span className="highlight"></span>
+                <span className="bar"></span>
+                <label>Categories</label>
+              </div>
+              <div className="group">
+                <textarea
+                  type="textarea"
+                  rows="5"
+                  required
+                  value={intro}
+                  onChange={(e) => setIntro(e.target.value)}
+                />
+                <span className="highlight"></span>
+                <span className="bar"></span>
+                <label>Introduction</label>
+              </div>
+              <div className="btn-box">
+                <button
+                  className="btn btn-submit"
+                  type="button"
+                  onClick={createCourse}
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
+      )}
+      {/* day */}
+      {role === "Basic" && (
+        <div className="basic_user">
+          <h1>Hello, {user}!</h1>
+          <div className="user_courses_list">{user_course_list}</div>
+        </div>
+      )}
       <Footer />
     </div>
   );

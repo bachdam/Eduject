@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useContext } from "react";
 import Footer from "components/footers/SimpleFiveColumn.js";
 import axios from "axios";
 import "../styles/LessonPage.css";
@@ -10,6 +10,7 @@ import { useParams } from "react-router-dom";
 import updateIcon from "../images/refresh.png";
 import deleteIcon from "../images/bin.png";
 import DOMPurify from "dompurify";
+import { AuthContext } from "context/AuthContext.jsx";
 
 const LessonPage = () => {
   const { courseId } = useParams();
@@ -19,6 +20,7 @@ const LessonPage = () => {
   const [lessonsList, setLessonsList] = useState([]);
   const [courseName, setCourseName] = useState("");
   const [selectedLesson, setSelectedLesson] = useState("");
+  const { user, role } = useContext(AuthContext);
 
   //create lesson
   const createLesson = async (e) => {
@@ -115,92 +117,96 @@ const LessonPage = () => {
     <div>
       <Header />
       {/* day */}
-      <div>
-        <h1 className="course_name">{courseName}</h1>
-        <div className="container">
-          <div className="lessons_display">
-            <ul>
-              {lessonsList.map((item, index) => {
-                console.log("item title:", item.title);
-                console.log("lessonsList: ", lessonsList);
-                return (
-                  <li key={index} className="lessonTitle">
-                    {item.title}{" "}
-                    <button
-                      key={item._id}
-                      type="submit"
-                      onClick={() => updateLesson(item._id)}
-                    >
-                      <img src={updateIcon} alt="update icon" />
-                    </button>
-                    <button
-                      key={index}
-                      type="submit"
-                      className="deletebtn"
-                      onClick={() => deleteLesson(item._id)}
-                    >
-                      <img src={deleteIcon} alt="delete icon" />
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          <div>
-            <input
-              type="text"
-              value={title}
-              placeholder="Title here!"
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <TextEditor value={detail} onChange={setDetail} />
-          </div>
-
-          <button type="submit" onClick={createLesson}>
-            Add Lesson
-          </button>
-        </div>
-      </div>
-      {/* day */}
-      {/* <div className="course-container">
-        <h1 className="course-name">{courseName}</h1>
-        <div className="content-container">
-          <div className="lesson-content">
-            {selectedLesson ? (
-              // <p>{selectedLesson.detail}</p>
-              <div
-                className="lesson-detail"
-                // dangerouslySetInnerHTML={{ __html: selectedLesson.detail }}
-                dangerouslySetInnerHTML={verifiedLessonContent()}
-              ></div>
-            ) : (
-              <p>Please select a lesson to view its content.</p>
-            )}
-          </div>
-          <div className="lessons">
-            <div className="lesson-header">
-              <span className="view-title">Lessons</span>
+      {role === "Admin" && (
+        <div>
+          <h1 className="course_name">{courseName}</h1>
+          <div className="container">
+            <div className="lessons_display">
+              <ul>
+                {lessonsList.map((item, index) => {
+                  console.log("item title:", item.title);
+                  console.log("lessonsList: ", lessonsList);
+                  return (
+                    <li key={index} className="lessonTitle">
+                      {item.title}{" "}
+                      <button
+                        key={item._id}
+                        type="submit"
+                        onClick={() => updateLesson(item._id)}
+                      >
+                        <img src={updateIcon} alt="update icon" />
+                      </button>
+                      <button
+                        key={index}
+                        type="submit"
+                        className="deletebtn"
+                        onClick={() => deleteLesson(item._id)}
+                      >
+                        <img src={deleteIcon} alt="delete icon" />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
-            <ul>
-              {lessonsList.map((item, index) => {
-                return (
-                  <li key={index}>
-                    <button
-                      className="lesson-button"
-                      onClick={() => {
-                        console.log(item);
-                        setSelectedLesson(item);
-                      }}
-                    >
-                      {item.title}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
+            <div>
+              <input
+                type="text"
+                value={title}
+                placeholder="Title here!"
+                onChange={(e) => setTitle(e.target.value)}
+              />
+              <TextEditor value={detail} onChange={setDetail} />
+            </div>
+
+            <button type="submit" onClick={createLesson}>
+              Add Lesson
+            </button>
           </div>
         </div>
-      </div> */}
+      )}
+      {/* day */}
+      {role === "Basic" && (
+        <div className="course-container">
+          <h1 className="course-name">{courseName}</h1>
+          <div className="content-container">
+            <div className="lesson-content">
+              {selectedLesson ? (
+                // <p>{selectedLesson.detail}</p>
+                <div
+                  className="lesson-detail"
+                  // dangerouslySetInnerHTML={{ __html: selectedLesson.detail }}
+                  dangerouslySetInnerHTML={verifiedLessonContent()}
+                ></div>
+              ) : (
+                <p>Please select a lesson to view its content.</p>
+              )}
+            </div>
+            <div className="lessons">
+              <div className="lesson-header">
+                <span className="view-title">Lessons</span>
+              </div>
+              <ul>
+                {lessonsList.map((item, index) => {
+                  return (
+                    <li key={index}>
+                      <button
+                        className="lesson-button"
+                        onClick={() => {
+                          console.log(item);
+                          setSelectedLesson(item);
+                        }}
+                      >
+                        {item.title}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
