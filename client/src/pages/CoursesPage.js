@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useContext } from "react";
 import Footer from "components/footers/SimpleFiveColumn.js";
 import axios from "axios";
 // import "ckeditor5/ckeditor5.css";
@@ -7,6 +7,7 @@ import TextEditor from "./TextEditor";
 import Header from "components/headers/light.js";
 import "../styles/NewCourse.css";
 import { json, useNavigate } from "react-router-dom";
+import { AuthContext } from "context/AuthContext.jsx";
 
 const CoursesPage = () => {
   const [title, setTitle] = useState("");
@@ -17,7 +18,10 @@ const CoursesPage = () => {
   const [intro, setIntro] = useState("");
   const [coursesList, setCoursesList] = useState([]);
   const navigate = useNavigate();
+  const { user, role } = useContext(AuthContext);
 
+  console.log("User in COurse Page: ", user);
+  console.log("User role in COurse Page: ", role);
   const createCourse = async (e) => {
     e.preventDefault();
     try {

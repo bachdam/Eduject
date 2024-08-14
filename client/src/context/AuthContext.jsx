@@ -5,6 +5,7 @@ export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
   const [registerError, setRegisterError] = useState(null);
   const [isRegisterLoading, setIsRegisterLoading] = useState(false);
   const [registerInfor, setRegisterInfor] = useState({
@@ -31,18 +32,18 @@ export const AuthContextProvider = ({ children }) => {
           setUser(JSON.parse(user));  
         } catch (error) {  
             console.error( error);  
-            // localStorage.removeItem("User");  
+            localStorage.removeItem("User");  
         }  
     }  
 }, []);  
 
   useEffect(() => {  
     const token = localStorage.getItem('token');  
-    if (token) {  
+    if (user && token) {  
       setIsLoggedIn(true); // User is logged in  
     }  
     console.log("token from Local:", token)
-  }, []);
+  }, [user, isLoggedIn]);
 
 
   //   this is a hook to update the register data without refreshing everytime we render
@@ -110,7 +111,7 @@ export const AuthContextProvider = ({ children }) => {
 
         //save user and token to local storage
         localStorage.setItem("User", JSON.stringify(userData.name));
-        localStorage.setItem("Token", userData.token);
+        localStorage.setItem("Token", JSON.stringify(userData.token));
 
         //user infor
         const userInfo = localStorage.getItem("User");

@@ -72,7 +72,13 @@ const loginUser = async (req, res) => {
 
     //if login success, create token
     const token = createToken(user._id);
-    res.status(200).json({ _id: user._id, name: user.username, email, token });
+    res.status(200).json({
+      _id: user._id,
+      name: user.username,
+      email,
+      role: user.role,
+      token,
+    });
     console.log("token:", token);
   } catch (e) {
     console.log(e);
