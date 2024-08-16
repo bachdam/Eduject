@@ -17,10 +17,13 @@ const CoursesPage = () => {
   const [categories, setCategories] = useState("");
   const [intro, setIntro] = useState("");
   const [coursesList, setCoursesList] = useState([]);
+  const [userCoursesList, setUserCoursesList] = useState([]);
   const navigate = useNavigate();
-  const { user, role } = useContext(AuthContext);
+  const { user, role, userId } = useContext(AuthContext);
+  const [browseCourses, setBrowseCourses] = useState(false);
 
   console.log("User in COurse Page: ", user);
+  console.log("User_id in COurse Page: ", userId);
   console.log("User role in COurse Page: ", role);
 
   const createCourse = async (e) => {
@@ -62,7 +65,19 @@ const CoursesPage = () => {
       const response = await axios.get(
         `http://localhost:8080/api/courses/get_courses`
       );
-      setCoursesList(response.data);
+      setUserCoursesList(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //get all the courses of current user
+  const fetchUserCourses = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/users/${userId}/get_courses`
+      );
+      setUserCoursesList(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -89,22 +104,43 @@ const CoursesPage = () => {
   useEffect(() => {
     fetchCourses();
   }, []);
+  useEffect(() => {
+    fetchUserCourses();
+  }, []);
 
   const handleUserChoice = (courseId) => {
     navigate(`/courses/${courseId}/lessons`);
   };
 
   //display all the courses from db to the screen
-  let list = coursesList.map((item) => {
-    console.log(item.title);
+  const list = coursesList.map((item) => {
     return (
-      <button key={item._id} onClick={() => chosenCourse(item._id)}>
-        {item.title}
-      </button>
+      <div
+        className="course"
+        key={item._id}
+        // onClick={() => chosenCourse(item._id)}
+      >
+        <h2>{item.title}</h2>
+        <p>
+          {item.intro
+            ? item.intro.substring(0, 20) +
+              (item.intro.length > 20 ? "..." : "")
+            : "No description available"}
+        </p>
+        <button onClick={() => handleEnrollInCourse(item._id)}>
+          Enroll Now
+        </button>
+      </div>
     );
+    // return (
+    //   <button key={item._id} onClick={() => chosenCourse(item._id)}>
+    //     {item.title}
+    //   </button>
+    // );
   });
 
-  const user_course_list = coursesList.map((item) => (
+  //list all the course of current user
+  const user_course_list = userCoursesList.map((item) => (
     <div
       className="course"
       key={item.id}
@@ -118,6 +154,52 @@ const CoursesPage = () => {
       </p>
     </div>
   ));
+
+  // Example of a function that is called when a user selects to enroll in a course
+  const handleEnrollInCourse = async (courseId) => {
+    // Assuming you have access to the user's ID from context or props
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/users/${userId}/enroll/${courseId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId, courseId }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to enroll in course");
+      }
+
+      console.log(`Successfully enrolled in course: ${result.message}`);
+      // Optionally update the user's UI or state to reflect the enrollment
+    } catch (error) {
+      console.error("Error enrolling in course:", error.message);
+    }
+  };
+
+  // Example button in your course component
+  // <button onClick={() => handleEnrollInCourse(selectedCourseId)}>
+  //   Enroll in Course
+  // </button>;
+
+  const user_choose_new_courses = () => {
+    setBrowseCourses(true);
+    console.log("after: ", browseCourses);
+  };
+
+  const user_choose_their_courses = () => {
+    setBrowseCourses(false);
+    console.log("after: ", browseCourses);
+  };
+
+  console.log("user courses: ", userCoursesList);
   return (
     <div>
       <Header />
@@ -217,12 +299,32 @@ const CoursesPage = () => {
         </div>
       )}
       {/* day */}
-      {role === "Basic" && (
+      <div>
+        <button onClick={user_choose_new_courses}>Browse More Courses</button>
+        <button onClick={user_choose_their_courses}>View Your Courses</button>
+      </div>
+      {role === "Basic" && browseCourses ? (
+        <div className="basic_user">
+          <h1>Hello, {user}!</h1>
+          <div className="user_courses_list">{list}</div>
+        </div>
+      ) : (
         <div className="basic_user">
           <h1>Hello, {user}!</h1>
           <div className="user_courses_list">{user_course_list}</div>
         </div>
       )}
+      {/* {role === "Basic" && browseCourses && (
+        <div className="basic_user">
+          <h1>Hello, {user}!</h1>
+          <div className="user_courses_list">{user_course_list}</div>
+        </div>
+      )}
+      {role === "Basic" && !browseCourses && (
+        <div className="basic_user">
+          <h1>Hello, {user}!</h1>
+        </div>
+      )} */}
       <Footer />
     </div>
   );

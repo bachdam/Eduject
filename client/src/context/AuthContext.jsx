@@ -5,6 +5,7 @@ export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [role, setRole] = useState(null);
   const [registerError, setRegisterError] = useState(null);
   const [isRegisterLoading, setIsRegisterLoading] = useState(false);
@@ -23,19 +24,22 @@ export const AuthContextProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
 
   console.log("User", user);
-  console.log("loginInfor", loginInfor);
+  console.log("user_id", userId);
 
   useEffect(() => {  
     const user = localStorage.getItem("User");  
     const role = localStorage.getItem("Role"); 
+    const userId = localStorage.getItem("UserId"); 
     if (user) {  
         try {  
           setUser(JSON.parse(user));  
           setRole(JSON.parse(role)); 
+          setUserId(JSON.parse(userId)); 
         } catch (error) {  
             console.error( error);  
             localStorage.removeItem("User");  
             localStorage.removeItem("Role");
+            localStorage.removeItem("UserId");
         }  
     }  
 }, []);  
@@ -115,6 +119,7 @@ export const AuthContextProvider = ({ children }) => {
         //save user and token to local storage
         localStorage.setItem("User", JSON.stringify(userData.name));
         localStorage.setItem("Role", JSON.stringify(userData.role));
+        localStorage.setItem("UserId", JSON.stringify(userData._id));
         localStorage.setItem("Token", JSON.stringify(userData.token));
 
         //user infor
@@ -126,6 +131,7 @@ export const AuthContextProvider = ({ children }) => {
         console.log('Login successful! Token stored:', userToken);
         setUser(userData.name);
         setRole(userData.role);
+        setUserId(userData._id)
         window.location.href = "/"; // Navigate using window.location
         
       } catch (error) {
@@ -142,8 +148,10 @@ export const AuthContextProvider = ({ children }) => {
     localStorage.removeItem("User");
     localStorage.removeItem("Token");
     localStorage.removeItem("Role");
+    localStorage.removeItem("UserId");
     setUser(null);
     setRole(null);
+    setUserId(null);
     setIsLoggedIn(false);
   }, []);
 
@@ -151,6 +159,7 @@ export const AuthContextProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
+        userId,
         role,
         registerInfor,
         updateRegisterInfor,
