@@ -30,8 +30,6 @@ Welcome to **Eduject**! This project is a online learning web application design
 
 ---
 
-## 🚀 Getting Started
-
 ### Prerequisites
 
 Ensure you have the following installed on your system:
